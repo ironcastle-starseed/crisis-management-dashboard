@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이슈 히스토리 — 위기관리 대시보드</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: #f5f5f7;
+      color: #1f2937;
+      padding: 32px 20px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* ============ Wireframe banner ============ */
+    .wf-banner {
+      background: #fff7ed;
+      border: 1px dashed #fb923c;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #9a3412;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ============ Tabs ============ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0 12px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .tab {
+      padding: 18px 22px;
+      font-size: 16px;
+      color: #9ca3af;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .tab:hover { color: #4b5563; }
+
+    .tab.active {
+      color: #111827;
+      font-weight: 700;
+      border-bottom-color: #111827;
+    }
+
+    /* ============ Page header ============ */
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* ============ Filter bar ============ */
+    .filter-bar {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .filter-group .flabel {
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .filter-select {
+      padding: 5px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+      color: #374151;
+      min-width: 90px;
+      cursor: pointer;
+    }
+
+    .search-input {
+      padding: 6px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 12px;
+      width: 180px;
+      margin-left: auto;
+    }
+
+    /* ============ Section title ============ */
+    .section-title {
+      margin: 28px 0 14px;
+    }
+
+    .section-title h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+
+    /* ============ View toggle / sort ============ */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .view-toggle {
+      display: flex;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .view-toggle .v {
+      padding: 5px 12px;
+      font-size: 12px;
+      color: #6b7280;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .view-toggle .v.active {
+      background: #111827;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sort {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .sort select {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .count-label {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .count-label strong {
+      color: #111827;
+    }
+
+    /* ============ Issue list ============ */
+    .issue-list {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .issue-row {
+      display: grid;
+      grid-template-columns: 90px 110px 80px 1fr 80px 90px 50px;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 12px;
+    }
+
+    .issue-row:last-child {
+      border-bottom: none;
+    }
+
+    .issue-row.head {
+      background: #f9fafb;
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+
+    .i-date {
+      color: #6b7280;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .i-brand {
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .cat {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #f3f4f6;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    .cat.quality {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .cat.ad {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .cat.owner {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .cat.labor {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .cat.privacy {
+      background: #cffafe;
+      color: #155e75;
+    }
+
+    .cat.esg {
+      background: #dcfce7;
+      color: #14532d;
+    }
+
+    .cat.etc {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .type-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .type-chip {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      font-size: 12px;
+      color: #4b5563;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.12s;
+    }
+
+    .type-chip:hover {
+      border-color: #9ca3af;
+      color: #111827;
+    }
+
+    .type-chip.active {
+      background: #111827;
+      border-color: #111827;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .type-chip .count {
+      margin-left: 4px;
+      font-size: 11px;
+      opacity: 0.7;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sev {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      min-width: 40px;
+    }
+
+    .sev.crisis {
+      background: #1f2937;
+      color: #fff;
+    }
+
+    .sev.high {
+      background: #4b5563;
+      color: #fff;
+    }
+
+    .sev.mid {
+      background: #9ca3af;
+      color: #fff;
+    }
+
+    .sev.low {
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .i-title {
+      color: #111827;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .i-duration {
+      color: #6b7280;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .i-status {
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .i-status .st-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .i-status.resolved {
+      color: #6b7280;
+    }
+
+    .i-status.resolved .st-dot {
+      background: #9ca3af;
+    }
+
+    .i-status.ongoing {
+      color: #111827;
+    }
+
+    .i-status.ongoing .st-dot {
+      background: #1f2937;
+    }
+
+    .i-status.monitoring {
+      color: #4b5563;
+    }
+
+    .i-status.monitoring .st-dot {
+      background: #6b7280;
+    }
+
+    .i-detail {
+      text-align: right;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    /* ============ Pagination ============ */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 32px;
+    }
+
+    .pagination .pg {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+      color: #6b7280;
+      cursor: pointer;
+    }
+
+    .pagination .pg.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+      font-weight: 600;
+    }
+
+    /* ============ Timeline view ============ */
+    .tl-legend {
+      background: #fff;
+      border: 1px dashed #d4d4d8;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 11px;
+      color: #52525b;
+    }
+
+    .tl-legend-title {
+      font-weight: 700;
+      color: #111827;
+      margin-right: 4px;
+    }
+
+    .tl-lg-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tl-lg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .tl-legend-note {
+      color: #9ca3af;
+      margin-left: auto;
+    }
+
+    .tl {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 24px 20px;
+      margin-bottom: 16px;
+    }
+
+    .tl-year-group {
+      padding: 14px 0 4px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .tl-year-group:last-child {
+      border-bottom: none;
+    }
+
+    .tl-year-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0 14px;
+      margin-left: -6px;
+    }
+
+    .tl-year-head .yr {
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .tl-year-head .yr-stats {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .tl-events {
+      position: relative;
+    }
+
+    .tl-events::before {
+      content: '';
+      position: absolute;
+      left: 85px;
+      top: 18px;
+      bottom: 18px;
+      width: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+
+    .tl-event {
+      display: grid;
+      grid-template-columns: 72px 26px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 10px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tl-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      padding-top: 14px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tl-date .day-hint {
+      display: block;
+      font-size: 10px;
+      color: #111827;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .tl-track {
+      display: flex;
+      justify-content: center;
+      padding-top: 16px;
+    }
+
+    .tl-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #d1d5db;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px #d1d5db;
+    }
+
+    .tl-dot.crisis {
+      background: #1f2937;
+      box-shadow: 0 0 0 2px #1f2937, 0 0 0 6px #e5e7eb;
+    }
+
+    .tl-dot.high {
+      background: #4b5563;
+      box-shadow: 0 0 0 2px #4b5563;
+    }
+
+    .tl-dot.mid {
+      background: #9ca3af;
+      box-shadow: 0 0 0 2px #9ca3af;
+    }
+
+    .tl-dot.low {
+      background: #d1d5db;
+      box-shadow: 0 0 0 2px #d1d5db;
+    }
+
+    .tl-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+
+    .tl-card:hover {
+      border-color: #d1d5db;
+    }
+
+    .tl-card-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tl-brand {
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+      margin-right: 4px;
+    }
+
+    .tl-brand.ours {
+      color: #111827;
+      background: #f3f4f6;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .tl-score {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 800;
+      color: #111827;
+      font-variant-numeric: tabular-nums;
+      padding: 1px 8px;
+      border: 1px dashed #d4d4d8;
+      border-radius: 4px;
+    }
+
+    .tl-title {
+      font-size: 13px;
+      color: #111827;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 5px;
+    }
+
+    .tl-meta {
+      display: flex;
+      gap: 14px;
+      font-size: 10px;
+      color: #9ca3af;
+      align-items: center;
+    }
+
+    .tl-meta .st-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: middle;
+    }
+
+    .tl-meta .st-dot.ongoing {
+      background: #1f2937;
+    }
+
+    .tl-meta .st-dot.resolved {
+      background: #9ca3af;
+    }
+
+    .tl-meta .st-dot.monitoring {
+      background: #6b7280;
+    }
+
+    .tl-more {
+      text-align: center;
+      padding: 12px 0;
+      margin-bottom: 28px;
+    }
+
+    .tl-more a {
+      font-size: 12px;
+      color: #6b7280;
+      text-decoration: none;
+      padding: 8px 16px;
+      border: 1px dashed #d4d4d8;
+      border-radius: 6px;
+    }
+
+    .tl-more a:hover {
+      border-color: #111827;
+      color: #111827;
+    }
+
+    /* View toggle behavior: clickable cursor */
+    .view-toggle .v {
+      cursor: pointer;
+    }
+
+    /* ============ Insights ============ */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .insight-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .insight-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 14px;
+    }
+
+    .insight-card .desc {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 14px;
+    }
+
+    /* Horizontal bar chart */
+    .hbar-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 40px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .hbar-row .label {
+      color: #4b5563;
+    }
+
+    .hbar-row .bar {
+      height: 16px;
+      background: #f3f4f6;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hbar-row .fill {
+      height: 100%;
+      background: #f97316;
+      border-radius: 3px;
+    }
+
+    .hbar-row .num {
+      color: #6b7280;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Top brands list */
+    .brand-list {
+      list-style: none;
+    }
+
+    .brand-row {
+      display: grid;
+      grid-template-columns: 20px 1fr 50px;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid #f3f4f6;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .brand-row:last-child {
+      border-bottom: none;
+    }
+
+    .brand-row .rank {
+      color: #9ca3af;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .brand-row .rank.top {
+      color: #111827;
+    }
+
+    .brand-row .bname {
+      color: #111827;
+      font-weight: 500;
+    }
+
+    .brand-row .bcount {
+      color: #6b7280;
+      text-align: right;
+      font-size: 11px;
+    }
+
+    /* Resolution time distribution */
+    .dist-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 30px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .dist-row .label {
+      color: #4b5563;
+    }
+
+    .dist-row .bar {
+      height: 10px;
+      background: #f3f4f6;
+      border-radius: 2px;
+    }
+
+    .dist-row .fill {
+      height: 100%;
+      background: #3b82f6;
+      border-radius: 2px;
+    }
+
+    .dist-row .num {
+      color: #6b7280;
+      text-align: right;
+    }
+
+    /* Footer */
+    .footer-meta {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px dashed #d1d5db;
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <a class="tab" href="dashboard.html">오늘의 위기</a>
+      <a class="tab" href="competitors.html">경쟁사</a>
+      <a class="tab" href="industry-news.html">산업군 종합 뉴스</a>
+      <a class="tab active" href="issue-history.html">이슈 히스토리</a>
+    </div>
+
+    <!-- Page header -->
+    <div class="page-header">
+      <h1>우리회사 이슈 히스토리</h1>
+      <p>국내 식품 산업 내에서 발생한 주요 이슈를 수집·분류하여 보관합니다. 유사 이슈 탐색, 대응 사례 학습, 업계 리스크 트렌드 파악에 활용됩니다.</p>
+    </div>
+
+    <!-- Insights -->
+    <div class="insights-grid">
+      <div class="insight-card sentiment-trend">
+        <h3>감정 변화 추이</h3>
+        <div class="desc">최근 20일간 SNS·뉴스 멘션 감정 점수 추이 — 4월 25일 이후 부정 영역 진입</div>
+        <div style="margin-top: 6px;">
+          <svg id="sentimentChart" style="width:100%; height:210px; display:block;"></svg>
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <h3>카테고리별 빈도</h3>
+        <div class="desc">최근 5년, 전체 127건 기준</div>
+        <div class="hbar-row"><span class="label">품질·안전</span>
+          <div class="bar">
+            <div class="fill" style="width:92%"></div>
+          </div><span class="num">48</span>
+        </div>
+        <div class="hbar-row"><span class="label">광고·표시</span>
+          <div class="bar">
+            <div class="fill" style="width:62%;background:#fbbf24;"></div>
+          </div><span class="num">32</span>
+        </div>
+        <div class="hbar-row"><span class="label">오너리스크</span>
+          <div class="bar">
+            <div class="fill" style="width:34%;background:#6366f1;"></div>
+          </div><span class="num">18</span>
+        </div>
+        <div class="hbar-row"><span class="label">노사·조직</span>
+          <div class="bar">
+            <div class="fill" style="width:26%;background:#8b5cf6;"></div>
+          </div><span class="num">13</span>
+        </div>
+        <div class="hbar-row"><span class="label">개인정보</span>
+          <div class="bar">
+            <div class="fill" style="width:18%;background:#06b6d4;"></div>
+          </div><span class="num">9</span>
+        </div>
+        <div class="hbar-row"><span class="label">ESG</span>
+          <div class="bar">
+            <div class="fill" style="width:12%;background:#10b981;"></div>
+          </div><span class="num">6</span>
+        </div>
+        <div class="hbar-row"><span class="label">기타</span>
+          <div class="bar">
+            <div class="fill" style="width:4%;background:#9ca3af;"></div>
+          </div><span class="num">1</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Section title -->
+    <div class="section-title">
+      <h2>전체 히스토리</h2>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-row">
+      <div class="count-label"><strong>127건</strong> 중 1–10 표시</div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="view-toggle">
+          <div class="v active" data-view="list">리스트</div>
+          <div class="v" data-view="timeline">타임라인</div>
+        </div>
+        <div class="sort">
+          정렬
+          <select>
+            <option>최신순</option>
+            <option>심각도순</option>
+            <option>지속기간순</option>
+            <option>브랜드명순</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ List view ============ -->
+    <div class="view view-list" data-view="list">
+
+      <!-- Issue list -->
+      <div class="issue-list">
+        <div class="issue-row head">
+          <div>발생일</div>
+          <div>카테고리</div>
+          <div>심각도</div>
+          <div>제목</div>
+          <div>지속</div>
+          <div>상태</div>
+          <div>점수</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2026.04.28</div>
+          <div><span class="cat quality">품질·안전</span></div>
+          <div><span class="sev crisis">위기</span></div>
+          <div class="i-title">비비고 만두서 이물질 혼입 신고…식약처 조사 착수</div>
+          <div class="i-duration">3시간</div>
+          <div><span class="i-status ongoing"><span class="st-dot"></span>진행 중</span></div>
+          <div class="i-detail">81</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2026.03.12</div>
+          <div><span class="cat ad">광고·표시</span></div>
+          <div><span class="sev high">위험</span></div>
+          <div class="i-title">'국산 원료 100%' 허위 표시 공정위 과징금 부과</div>
+          <div class="i-duration">41일</div>
+          <div><span class="i-status monitoring"><span class="st-dot"></span>모니터링</span></div>
+          <div class="i-detail">68</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2026.02.05</div>
+          <div><span class="cat quality">품질·안전</span></div>
+          <div><span class="sev high">위험</span></div>
+          <div class="i-title">과자 제품서 기준치 초과 방부제 검출 자진 회수</div>
+          <div class="i-duration">28일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">72</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2025.11.18</div>
+          <div><span class="cat esg">ESG</span></div>
+          <div><span class="sev mid">주의</span></div>
+          <div class="i-title">축산 원료 공급사 위생 이슈…브랜드 입장문 발표</div>
+          <div class="i-duration">62일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">54</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2025.09.04</div>
+          <div><span class="cat labor">노사·조직</span></div>
+          <div><span class="sev mid">주의</span></div>
+          <div class="i-title">공장 생산직 장시간 근무 논란 보도</div>
+          <div class="i-duration">18일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">47</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2025.07.22</div>
+          <div><span class="cat privacy">개인정보</span></div>
+          <div><span class="sev high">위험</span></div>
+          <div class="i-title">온라인몰 회원정보 12만 건 유출 사고</div>
+          <div class="i-duration">95일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">76</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2025.05.10</div>
+          <div><span class="cat ad">광고·표시</span></div>
+          <div><span class="sev low">관심</span></div>
+          <div class="i-title">푸드 인플루언서 협찬 미표기 논란 ('뒷광고')</div>
+          <div class="i-duration">14일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">38</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2025.03.02</div>
+          <div><span class="cat owner">오너리스크</span></div>
+          <div><span class="sev crisis">위기</span></div>
+          <div class="i-title">대표이사 갑질 녹취 공개…이사회 긴급 소집</div>
+          <div class="i-duration">134일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">88</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2024.12.15</div>
+          <div><span class="cat quality">품질·안전</span></div>
+          <div><span class="sev high">위험</span></div>
+          <div class="i-title">라면 제품서 이물질 혼입 신고…일부 로트 자진 회수</div>
+          <div class="i-duration">48일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">70</div>
+        </div>
+
+        <div class="issue-row">
+          <div class="i-date">2024.10.07</div>
+          <div><span class="cat ad">광고·표시</span></div>
+          <div><span class="sev mid">주의</span></div>
+          <div class="i-title">건강기능식품 기능성 표기 오류 관련 식약처 시정 명령</div>
+          <div class="i-duration">22일</div>
+          <div><span class="i-status resolved"><span class="st-dot"></span>해결</span></div>
+          <div class="i-detail">51</div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <div class="pg">‹</div>
+        <div class="pg active">1</div>
+        <div class="pg">2</div>
+        <div class="pg">3</div>
+        <div class="pg">4</div>
+        <div class="pg">…</div>
+        <div class="pg">13</div>
+        <div class="pg">›</div>
+      </div>
+
+    </div><!-- /view-list -->
+
+    <!-- ============ Timeline view ============ -->
+    <div class="view view-timeline" data-view="timeline" hidden>
+      <div class="tl-legend">
+        <span class="tl-legend-title">심각도</span>
+        <span class="tl-lg-item"><span class="tl-lg-dot" style="background:#1f2937;"></span>위기</span>
+        <span class="tl-lg-item"><span class="tl-lg-dot" style="background:#4b5563;"></span>위험</span>
+        <span class="tl-lg-item"><span class="tl-lg-dot" style="background:#9ca3af;"></span>주의</span>
+        <span class="tl-lg-item"><span class="tl-lg-dot" style="background:#d1d5db;"></span>관심</span>
+        <span class="tl-legend-note">· 세로선: 시간 흐름 · 하단으로 갈수록 과거</span>
+      </div>
+
+      <div class="tl">
+        <!-- YEAR 2026 -->
+        <div class="tl-year-group">
+          <div class="tl-year-head">
+            <span class="yr">2026</span>
+            <span class="yr-stats">3건 · 평균 점수 73.7 · 최고 81 (위기 1건)</span>
+          </div>
+          <div class="tl-events">
+            <div class="tl-event">
+              <div class="tl-date">04.28<span class="day-hint">· 오늘</span></div>
+              <div class="tl-track">
+                <div class="tl-dot crisis"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand ours">당사</span>
+                  <span class="cat quality">품질·안전</span>
+                  <span class="sev crisis">위기</span>
+                  <span class="tl-score">81</span>
+                </div>
+                <div class="tl-title">비비고 만두서 이물질 혼입 신고…식약처 조사 착수</div>
+                <div class="tl-meta">
+                  <span>지속 3시간</span>
+                  <span><span class="st-dot ongoing"></span>진행 중</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">03.12</div>
+              <div class="tl-track">
+                <div class="tl-dot high"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">오뚜기</span>
+                  <span class="cat ad">광고·표시</span>
+                  <span class="sev high">위험</span>
+                  <span class="tl-score">68</span>
+                </div>
+                <div class="tl-title">'국산 원료 100%' 허위 표시 공정위 과징금 부과</div>
+                <div class="tl-meta">
+                  <span>지속 41일</span>
+                  <span><span class="st-dot monitoring"></span>모니터링</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">02.05</div>
+              <div class="tl-track">
+                <div class="tl-dot high"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">빙그레</span>
+                  <span class="cat quality">품질·안전</span>
+                  <span class="sev high">위험</span>
+                  <span class="tl-score">72</span>
+                </div>
+                <div class="tl-title">과자 제품서 기준치 초과 방부제 검출 자진 회수</div>
+                <div class="tl-meta">
+                  <span>지속 28일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YEAR 2025 -->
+        <div class="tl-year-group">
+          <div class="tl-year-head">
+            <span class="yr">2025</span>
+            <span class="yr-stats">5건 · 평균 점수 60.6 · 최고 88 (위기 1건)</span>
+          </div>
+          <div class="tl-events">
+            <div class="tl-event">
+              <div class="tl-date">11.18</div>
+              <div class="tl-track">
+                <div class="tl-dot mid"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">풀무원</span>
+                  <span class="cat esg">ESG</span>
+                  <span class="sev mid">주의</span>
+                  <span class="tl-score">54</span>
+                </div>
+                <div class="tl-title">축산 원료 공급사 위생 이슈…브랜드 입장문 발표</div>
+                <div class="tl-meta">
+                  <span>지속 62일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">09.04</div>
+              <div class="tl-track">
+                <div class="tl-dot mid"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">대상</span>
+                  <span class="cat labor">노사·조직</span>
+                  <span class="sev mid">주의</span>
+                  <span class="tl-score">47</span>
+                </div>
+                <div class="tl-title">공장 생산직 장시간 근무 논란 보도</div>
+                <div class="tl-meta">
+                  <span>지속 18일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">07.22</div>
+              <div class="tl-track">
+                <div class="tl-dot high"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">농심</span>
+                  <span class="cat privacy">개인정보</span>
+                  <span class="sev high">위험</span>
+                  <span class="tl-score">76</span>
+                </div>
+                <div class="tl-title">온라인몰 회원정보 12만 건 유출 사고</div>
+                <div class="tl-meta">
+                  <span>지속 95일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">05.10</div>
+              <div class="tl-track">
+                <div class="tl-dot low"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">동원F&B</span>
+                  <span class="cat ad">광고·표시</span>
+                  <span class="sev low">관심</span>
+                  <span class="tl-score">38</span>
+                </div>
+                <div class="tl-title">푸드 인플루언서 협찬 미표기 논란 ('뒷광고')</div>
+                <div class="tl-meta">
+                  <span>지속 14일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">03.02</div>
+              <div class="tl-track">
+                <div class="tl-dot crisis"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">해태제과</span>
+                  <span class="cat owner">오너리스크</span>
+                  <span class="sev crisis">위기</span>
+                  <span class="tl-score">88</span>
+                </div>
+                <div class="tl-title">대표이사 갑질 녹취 공개…이사회 긴급 소집</div>
+                <div class="tl-meta">
+                  <span>지속 134일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YEAR 2024 -->
+        <div class="tl-year-group">
+          <div class="tl-year-head">
+            <span class="yr">2024</span>
+            <span class="yr-stats">2건 · 평균 점수 60.5 · 위험 1건 주의 1건</span>
+          </div>
+          <div class="tl-events">
+            <div class="tl-event">
+              <div class="tl-date">12.15</div>
+              <div class="tl-track">
+                <div class="tl-dot high"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">삼양식품</span>
+                  <span class="cat quality">품질·안전</span>
+                  <span class="sev high">위험</span>
+                  <span class="tl-score">70</span>
+                </div>
+                <div class="tl-title">라면 제품서 이물질 혼입 신고…일부 로트 자진 회수</div>
+                <div class="tl-meta">
+                  <span>지속 48일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tl-event">
+              <div class="tl-date">10.07</div>
+              <div class="tl-track">
+                <div class="tl-dot mid"></div>
+              </div>
+              <div class="tl-card">
+                <div class="tl-card-top">
+                  <span class="tl-brand">롯데칠성</span>
+                  <span class="cat ad">광고·표시</span>
+                  <span class="sev mid">주의</span>
+                  <span class="tl-score">51</span>
+                </div>
+                <div class="tl-title">건강기능식품 기능성 표기 오류 관련 식약처 시정 명령</div>
+                <div class="tl-meta">
+                  <span>지속 22일</span>
+                  <span><span class="st-dot resolved"></span>해결</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-more">
+        <a href="#">더 과거 이슈 보기 (2023년 이전) →</a>
+      </div>
+    </div><!-- /view-timeline -->
+
+    <script>
+      document.querySelectorAll('.view-toggle .v').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.view;
+          document.querySelectorAll('.view-toggle .v').forEach(b =>
+            b.classList.toggle('active', b === btn)
+          );
+          document.querySelectorAll('.view').forEach(v => {
+            if (v.dataset.view === target) v.removeAttribute('hidden');
+            else v.setAttribute('hidden', '');
+          });
+        });
+      });
+
+      // Sentiment trend chart
+      (function () {
+        const svg = document.getElementById('sentimentChart');
+        if (!svg) return;
+        const NS = 'http://www.w3.org/2000/svg';
+        const H = 210, padL = 70, padR = 24, padT = 18, padB = 28;
+
+        // 0 (매우 부정) ~ 100 (매우 긍정), 일자 11..30
+        const data = [80, 78, 80, 85, 82, 75, 50, 80, 78, 75, 70, 72, 65, 70, 50, 30, 22, 28, 22, 12];
+        const startDay = 11;
+
+        const labels = [
+          { score: 100, text: '매우 긍정' },
+          { score: 75, text: '긍정' },
+          { score: 50, text: '중립' },
+          { score: 25, text: '부정' },
+          { score: 0, text: '매우 부정' },
+        ];
+
+        const el = (name, attrs) => {
+          const e = document.createElementNS(NS, name);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          return e;
+        };
+
+        function render() {
+          const W = Math.max(svg.clientWidth || svg.parentElement.clientWidth || 0, 320);
+          const plotW = W - padL - padR, plotH = H - padT - padB;
+          const xFor = i => padL + i * plotW / (data.length - 1);
+          const yFor = s => padT + (1 - s / 100) * plotH;
+
+          svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+          while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+          // Defs / gradient
+          const defs = el('defs', {});
+          const grad = el('linearGradient', { id: 'sentGrad', x1: '0', y1: '0', x2: '1', y2: '0' });
+          [[0, '#10b981'], [0.42, '#10b981'], [0.55, '#fbbf24'], [0.72, '#ef4444'], [1, '#ef4444']]
+            .forEach(([o, c]) => grad.appendChild(el('stop', { offset: o, 'stop-color': c })));
+          defs.appendChild(grad);
+          svg.appendChild(defs);
+
+          // Gridlines + Y labels
+          labels.forEach(L => {
+            const y = yFor(L.score);
+            svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: y, y2: y, stroke: '#f1f5f9', 'stroke-width': 1 }));
+            const t = el('text', { x: padL - 12, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#9ca3af' });
+            t.textContent = L.text;
+            svg.appendChild(t);
+          });
+
+          // 평균 점선
+          const avgY = yFor(50);
+          svg.appendChild(el('line', {
+            x1: padL, x2: W - padR, y1: avgY, y2: avgY,
+            stroke: '#9ca3af', 'stroke-width': 1.5, 'stroke-dasharray': '4 4'
+          }));
+
+          // 평균 라벨 (pill)
+          const pillX = padL + 8, pillY = avgY - 11, pillW = 44, pillH = 22;
+          svg.appendChild(el('rect', {
+            x: pillX, y: pillY, width: pillW, height: pillH, rx: 6,
+            fill: '#fff', stroke: '#e5e7eb'
+          }));
+          const pillT = el('text', {
+            x: pillX + pillW / 2, y: pillY + 15,
+            'text-anchor': 'middle', 'font-size': 11, fill: '#4b5563', 'font-weight': 600
+          });
+          pillT.textContent = '평균';
+          svg.appendChild(pillT);
+
+          // X labels (일자)
+          data.forEach((_, i) => {
+            const t = el('text', {
+              x: xFor(i), y: H - padB + 18,
+              'text-anchor': 'middle', 'font-size': 11, fill: '#9ca3af'
+            });
+            t.textContent = startDay + i;
+            svg.appendChild(t);
+          });
+
+          // Smooth path (Catmull-Rom → cubic Bezier)
+          const pts = data.map((s, i) => [xFor(i), yFor(s)]);
+          let d = `M ${pts[0][0]} ${pts[0][1]}`;
+          for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[i - 1] || pts[i];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[i + 2] || pts[i + 1];
+            const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+            const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+            const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+            const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+            d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2[0]} ${p2[1]}`;
+          }
+          svg.appendChild(el('path', {
+            d: d, fill: 'none', stroke: 'url(#sentGrad)',
+            'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+          }));
+
+          // 끝점 강조 (glow + dot)
+          const last = pts[pts.length - 1];
+          svg.appendChild(el('circle', { cx: last[0], cy: last[1], r: 11, fill: '#ef4444', opacity: 0.18 }));
+          svg.appendChild(el('circle', {
+            cx: last[0], cy: last[1], r: 5,
+            fill: '#ef4444', stroke: '#fff', 'stroke-width': 2
+          }));
+        }
+
+        let raf;
+        const schedule = () => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(render);
+        };
+        if ('ResizeObserver' in window) {
+          new ResizeObserver(schedule).observe(svg);
+        } else {
+          window.addEventListener('resize', schedule);
+          schedule();
+        }
+      })();
+    </script>
+
+    <!-- Footer -->
+    <div class="footer-meta">
+      <span>* 본 화면은 저충실도 와이어프레임입니다. 색/간격/아이콘은 비주얼 시안 단계에서 확정됩니다.</span>
+      <span>수집 범위: 공개 뉴스 · 공시 · 보도자료 / 아카이브 업데이트: 매일 09:00</span>
+    </div>
+
+  </div>
+</body>
+
+</html>

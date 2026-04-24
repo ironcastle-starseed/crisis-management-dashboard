@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>산업군 종합 뉴스 — 위기관리 대시보드</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    background: #f5f5f7;
+    color: #1f2937;
+    padding: 32px 20px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .container { max-width: 1180px; margin: 0 auto; }
+
+  .wf-banner {
+    background: #fff7ed;
+    border: 1px dashed #fb923c;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: #9a3412;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .tab {
+    padding: 18px 22px;
+    font-size: 16px;
+    color: #9ca3af;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab:hover { color: #4b5563; }
+  .tab.active {
+    color: #111827;
+    font-weight: 700;
+    border-bottom-color: #111827;
+  }
+
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .section { margin-bottom: 32px; }
+  .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+    padding-left: 10px;
+    border-left: 3px solid #111827;
+  }
+  .section-title h2 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.01em;
+  }
+  .section-title .sub {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+
+  /* ============ Monitoring keywords ============ */
+  .kw-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .kw-groups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .kw-group {
+    border-right: 1px dashed #e5e7eb;
+    padding-right: 20px;
+  }
+  .kw-group:last-child { border-right: none; padding-right: 0; }
+  .kw-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .kw-group-title .cnt {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .kw-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .kw {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid transparent;
+  }
+  .kw .hits {
+    font-size: 10px;
+    color: #9ca3af;
+    font-variant-numeric: tabular-nums;
+  }
+  .kw.brand { background: #eef2ff; color: #3730a3; }
+  .kw.brand .hits { color: #6366f1; }
+  .kw.risk { background: #fef2f2; color: #991b1b; }
+  .kw.risk .hits { color: #dc2626; }
+  .kw.industry { background: #ecfdf5; color: #065f46; }
+  .kw.industry .hits { color: #059669; }
+  .kw.add {
+    background: #fff;
+    color: #6b7280;
+    border: 1px dashed #d1d5db;
+    cursor: pointer;
+  }
+
+  /* ============ Filter bar ============ */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .filter-chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 12px;
+    color: #4b5563;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.12s;
+  }
+  .filter-chip:hover { border-color: #9ca3af; color: #111827; }
+  .filter-chip.active {
+    background: #111827;
+    border-color: #111827;
+    color: #fff;
+    font-weight: 600;
+  }
+  .filter-chip .count {
+    margin-left: 4px;
+    font-size: 10px;
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============ News feed ============ */
+  .news-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 8px 0;
+  }
+  .news-item {
+    display: grid;
+    grid-template-columns: 180px 1fr 72px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-item[hidden] { display: none; }
+  .news-item .n-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .news-item .n-title {
+    color: #111827;
+    font-weight: 500;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .news-item .n-time {
+    color: #9ca3af;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .news-tier {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+    background: #fff;
+  }
+  .news-tier.t1 { background: #111827; color: #fff; border-color: #111827; }
+  .news-tier.t2 { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
+  .news-tier.t3 { background: #fff; color: #9ca3af; }
+
+  .news-empty {
+    padding: 32px 20px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 12px;
+  }
+
+  .footer-meta {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px dashed #d1d5db;
+    font-size: 11px;
+    color: #9ca3af;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="tabs">
+    <a class="tab" href="dashboard.html">오늘의 위기</a>
+    <a class="tab" href="competitors.html">경쟁사</a>
+    <a class="tab active" href="industry-news.html">산업군 종합 뉴스</a>
+    <a class="tab" href="issue-history.html">이슈 히스토리</a>
+  </div>
+
+  <div class="page-header">
+    <h1>산업군 종합 뉴스</h1>
+    <p>식품 산업군에 대한 뉴스를 모니터링 키워드 기반으로 수집합니다. 키워드 설정을 기준으로 CJ제일제당·경쟁사·산업 이슈를 한 번에 볼 수 있습니다.</p>
+  </div>
+
+  <!-- ============ 모니터링 키워드 ============ -->
+  <div class="section">
+    <div class="section-title">
+      <h2>모니터링 중인 키워드</h2>
+      <span class="sub">총 24개 · <a href="#" style="color:#6b7280;text-decoration:underline;">키워드 편집</a></span>
+    </div>
+
+    <div class="kw-card">
+      <div class="kw-list">
+        <span class="kw">당사</span>
+        <span class="kw">동원F&amp;B</span>
+        <span class="kw">오뚜기</span>
+        <span class="kw">대상</span>
+        <span class="kw">풀무원</span>
+        <span class="kw">농심</span>
+        <span class="kw">삼양식품</span>
+        <span class="kw">해태제과</span>
+        <span class="kw">빙그레</span>
+        <span class="kw">이물질</span>
+        <span class="kw">리콜</span>
+        <span class="kw">원산지 허위</span>
+        <span class="kw">알레르기</span>
+        <span class="kw">불매</span>
+        <span class="kw">공정위</span>
+        <span class="kw">식약처</span>
+        <span class="kw">과징금</span>
+        <span class="kw">갑질</span>
+        <span class="kw">개인정보 유출</span>
+        <span class="kw">K-푸드</span>
+        <span class="kw">HMR</span>
+        <span class="kw">친환경 패키지</span>
+        <span class="kw">ESG</span>
+        <span class="kw">건강기능식품</span>
+        <span class="kw add">+ 키워드 추가</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 뉴스 피드 ============ -->
+  <div class="section">
+    <div class="section-title">
+      <h2>수집된 뉴스</h2>
+      <span class="sub">최근 24시간 · 모니터링 키워드 매칭 기사</span>
+    </div>
+
+    <div class="filters" id="tierFilters">
+      <button class="filter-chip active" data-tier="all">전체 <span class="count"></span></button>
+      <button class="filter-chip" data-tier="t1">TIER 1 (중앙지·통신사) <span class="count"></span></button>
+      <button class="filter-chip" data-tier="t2">TIER 2 (경제지·방송) <span class="count"></span></button>
+      <button class="filter-chip" data-tier="t3">TIER 3 (전문지·기타) <span class="count"></span></button>
+    </div>
+
+    <div class="news-card" id="newsFeed">
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>조선일보</div>
+        <div class="n-title">CJ제일제당 비비고 만두서 이물질 혼입 신고…"정밀 분석 착수"</div>
+        <div class="n-time">1시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>한국경제</div>
+        <div class="n-title">'국산 원료 100%' 표시 관련 소비자단체 추가 제소… 공정위 재조사 가능성</div>
+        <div class="n-time">2시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>매일경제</div>
+        <div class="n-title">동원F&amp;B '프리미엄 참치' 신제품 라인업 출시… 홈쇼핑 론칭 하루 만에 완판</div>
+        <div class="n-time">3시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>동아일보</div>
+        <div class="n-title">"이물질 논란" CJ제일제당 품질관리 도마 위…식약처 조사 착수</div>
+        <div class="n-time">3시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>조선일보</div>
+        <div class="n-title">미국·일본 수출 전년 대비 +24%… K-푸드 회복세 견인</div>
+        <div class="n-time">4시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>연합뉴스</div>
+        <div class="n-title">공정위 "원산지 허위" 인정… 오뚜기 과징금 부과 절차 착수</div>
+        <div class="n-time">5시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>아시아경제</div>
+        <div class="n-title">대상 종가집 김치 프리미엄 라인 리뉴얼… 3분기 체험 마케팅 개편</div>
+        <div class="n-time">7시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>조선일보</div>
+        <div class="n-title">풀무원 두부·나물 HMR 미국 수출 신기록… 현지 매출 3년 연속 두 자릿수 성장</div>
+        <div class="n-time">9시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t3">
+        <div class="n-source"><span class="news-tier t3">TIER 3</span>식품저널</div>
+        <div class="n-title">맘카페발 불매 해시태그 확산… 오뚜기 관련 커뮤니티 게시물 1,200건 돌파</div>
+        <div class="n-time">11시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>한국경제</div>
+        <div class="n-title">풀무원 ESG 보고서 발간… 식품 탄소발자국 전년 대비 -12% 감축 발표</div>
+        <div class="n-time">13시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>매일경제</div>
+        <div class="n-title">업계 "HMR 원재료 표기 기준 통일" 자율협약 추진… 주요 7개사 참여</div>
+        <div class="n-time">15시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t3">
+        <div class="n-source"><span class="news-tier t3">TIER 3</span>식품음료신문</div>
+        <div class="n-title">동원F&amp;B 친환경 리필 스테이션형 식품관 전국 30개 매장 확대 운영</div>
+        <div class="n-time">18시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>중앙일보</div>
+        <div class="n-title">농심 북미 법인 3분기 흑자 전환… "K-푸드 선두 탈환 신호"</div>
+        <div class="n-time">20시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t2">
+        <div class="n-source"><span class="news-tier t2">TIER 2</span>머니투데이</div>
+        <div class="n-title">삼양식품 ESG 평가 A+ 유지… 재활용 포장재 사용 비중 42%</div>
+        <div class="n-time">22시간 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t1">
+        <div class="n-source"><span class="news-tier t1">TIER 1</span>한겨레</div>
+        <div class="n-title">해태제과 대표 '갑질 녹취' 공개 재점화… 이사회 긴급 대응 논의</div>
+        <div class="n-time">1일 전</div>
+      </div>
+
+      <div class="news-item" data-tier="t3">
+        <div class="n-source"><span class="news-tier t3">TIER 3</span>농수축산신문</div>
+        <div class="n-title">건강기능식품 시장 점유율 18% 돌파… "K-푸드 세대교체 본격화"</div>
+        <div class="n-time">1일 전</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-meta">
+    <span>* 본 화면은 저충실도 와이어프레임입니다. 색/간격/아이콘은 비주얼 시안 단계에서 확정됩니다.</span>
+    <span>데이터: 뉴스 · SNS · 커뮤니티 · 리뷰 / 업데이트: 실시간 (최근 5분)</span>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    const feed = document.getElementById('newsFeed');
+    const filters = document.getElementById('tierFilters');
+    if (!feed || !filters) return;
+
+    const items = Array.from(feed.querySelectorAll('.news-item'));
+
+    const counts = { all: items.length };
+    items.forEach(it => {
+      const t = it.dataset.tier;
+      if (t) counts[t] = (counts[t] || 0) + 1;
+    });
+    filters.querySelectorAll('.filter-chip').forEach(chip => {
+      const span = chip.querySelector('.count');
+      if (span) span.textContent = counts[chip.dataset.tier] || 0;
+    });
+
+    const empty = document.createElement('div');
+    empty.className = 'news-empty';
+    empty.textContent = '해당 티어에 매칭되는 기사가 없습니다.';
+    empty.hidden = true;
+    feed.appendChild(empty);
+
+    filters.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-chip');
+      if (!btn) return;
+      const target = btn.dataset.tier;
+      filters.querySelectorAll('.filter-chip').forEach(c =>
+        c.classList.toggle('active', c === btn)
+      );
+      let visible = 0;
+      items.forEach(it => {
+        const show = target === 'all' || it.dataset.tier === target;
+        it.hidden = !show;
+        if (show) visible++;
+      });
+      empty.hidden = visible > 0;
+    });
+  })();
+</script>
+</body>
+</html>
