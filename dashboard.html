@@ -5,22 +5,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>오늘의 위기 — 위기관리 대시보드</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
     :root {
-      --bg: #fafafa;
+      /* ─── Surface & Line ─── */
+      --bg: #f6f4ef;            /* warm off-white page */
       --surface: #ffffff;
-      --border: #e4e4e7;
-      --border-strong: #d4d4d8;
-      --border-dash: #d4d4d8;
-      --text-1: #18181b;
-      --text-2: #52525b;
-      --text-3: #a1a1aa;
-      --text-4: #d4d4d8;
-      --accent: #dc2626;
-      --accent-light: #fef2f2;
-      --accent-border: #fecaca;
-      --pos: #16a34a;
-      --pos-light: #f0fdf4;
+      --surface-soft: #fbfaf6;
+      --line: #e8e3d8;          /* warm hairline */
+      --line-strong: #d8d2c2;
+      --line-soft: #f0ece2;
+
+      /* ─── Ink ─── */
+      --ink-1: #1a1814;         /* near-black, warm */
+      --ink-2: #4f4a42;         /* body */
+      --ink-3: #8a8378;         /* muted */
+      --ink-4: #b8b1a4;         /* subtle */
+
+      /* ─── Accent (사용 절제) ─── */
+      --crisis: #a8221e;        /* deep crimson */
+      --crisis-soft: #f6e8e6;
+      --crisis-line: #ecd2cf;
+      --pos: #2f6b46;           /* forest */
+      --pos-soft: #ecf1ec;
+
+      /* legacy aliases for existing rules */
+      --border: var(--line);
+      --border-strong: var(--line-strong);
+      --border-dash: var(--line-strong);
+      --text-1: var(--ink-1);
+      --text-2: var(--ink-2);
+      --text-3: var(--ink-3);
+      --text-4: var(--ink-4);
+      --accent: var(--crisis);
+      --accent-light: var(--crisis-soft);
+      --accent-border: var(--crisis-line);
+      --pos-light: var(--pos-soft);
+
+      /* ─── Type ─── */
+      --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     * {
@@ -30,19 +54,32 @@
     }
 
     body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
-      color: var(--text-1);
-      padding: 32px 20px;
-      font-size: 13px;
-      line-height: 1.55;
+      color: var(--ink-1);
+      padding: 40px clamp(20px, 4vw, 56px) 80px;
+      font-size: 14px;
+      line-height: 1.6;
+      font-feature-settings: "ss03", "cv11";
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .container {
-      max-width: 1180px;
+      max-width: 1240px;
       margin: 0 auto;
     }
+
+    /* utility */
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-3);
+    }
+    .num-tab { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    a { color: inherit; }
 
     /* ============ Wireframe banner + Tabs ============ */
     .wf-banner {
@@ -67,123 +104,140 @@
 
     .tabs {
       display: flex;
-      gap: 4px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 0 12px;
-      margin-bottom: 28px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 8px;
+      margin-bottom: 40px;
     }
 
     .tab {
       padding: 18px 22px;
-      font-size: 16px;
-      color: #9ca3af;
+      font-size: 14.5px;
+      color: var(--ink-3);
       cursor: pointer;
       text-decoration: none;
       font-weight: 600;
-      border-bottom: 3px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease;
     }
 
     .tab:hover {
-      color: var(--text-2);
+      color: var(--ink-2);
     }
 
     .tab.active {
-      color: var(--text-1);
+      color: var(--ink-1);
       font-weight: 700;
-      border-bottom-color: var(--text-1);
+      border-bottom-color: var(--ink-1);
     }
 
     /* ============ Page title ============ */
     .page-title {
-      margin-bottom: 20px;
+      margin-bottom: 36px;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
     }
 
     .page-title h1 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-1);
+      font-size: clamp(26px, 2vw + 1rem, 34px);
+      font-weight: 800;
+      color: var(--ink-1);
+      letter-spacing: -0.025em;
+      line-height: 1.1;
     }
 
     .page-title .meta {
-      font-size: 11px;
-      color: var(--text-3);
+      font-size: 12px;
+      color: var(--ink-3);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.005em;
     }
 
     /* ============ Section ============ */
     .section {
-      margin-bottom: 56px;
+      margin-bottom: 80px;
     }
 
     .section-head {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 16px;
-      padding-left: 10px;
-      border-left: 3px solid var(--text-1);
+      align-items: baseline;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
     }
 
     .section-head h2 {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text-1);
-      letter-spacing: -0.01em;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink-1);
+      letter-spacing: -0.015em;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      line-height: 1.3;
     }
 
     .section-head h2 .num {
-      padding: 2px 8px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-2);
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: var(--ink-2);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
     }
 
     .section-head h2 .crit {
-      background: var(--accent-light);
-      color: var(--accent);
-      border-color: var(--accent-border);
+      background: var(--crisis);
+      color: #fff;
+      border-color: var(--crisis);
     }
 
     .section-head .meta {
-      font-size: 11px;
-      color: var(--text-3);
+      font-size: 11.5px;
+      color: var(--ink-3);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.005em;
     }
 
     /* ============ 1. Situation panel ============ */
     .situation {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px 28px;
-      margin-bottom: 64px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 32px 36px;
+      margin-bottom: 80px;
       display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 28px;
+      grid-template-columns: 260px 1fr;
+      gap: 40px;
       align-items: stretch;
+      position: relative;
+    }
+    .situation::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--crisis);
     }
 
     /* Gauge */
     .sit-gauge {
       text-align: center;
-      padding-right: 24px;
-      border-right: 1px dashed var(--border-dash);
+      padding-right: 32px;
+      border-right: 1px solid var(--line);
     }
 
     .sit-gauge svg {
-      width: 210px;
+      width: 220px;
       display: block;
       margin: 0 auto;
     }
@@ -192,45 +246,47 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 6px;
-      margin-top: 8px;
+      padding: 0 4px;
+      margin-top: 12px;
       font-size: 11px;
-      color: var(--text-1);
+      color: var(--ink-3);
       font-weight: 600;
     }
 
     .gauge-stages .active {
-      color: var(--accent);
+      color: var(--crisis);
       font-weight: 800;
-      font-size: 12px;
+      font-size: 11.5px;
       letter-spacing: 0.04em;
     }
 
     .gauge-number {
-      font-size: 34px;
+      font-size: 42px;
       font-weight: 800;
-      color: var(--text-1);
-      margin-top: 10px;
+      color: var(--ink-1);
+      margin-top: 16px;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.035em;
+      line-height: 1;
     }
 
     .gauge-number .slash {
-      font-size: 13px;
-      color: var(--text-3);
+      font-size: 14px;
+      color: var(--ink-4);
       font-weight: 500;
+      letter-spacing: -0.01em;
     }
 
     .gauge-stage-label {
       display: inline-block;
-      padding: 2px 10px;
-      background: var(--accent);
+      padding: 4px 12px;
+      background: var(--crisis);
       color: #fff;
-      border-radius: 10px;
-      font-size: 10px;
+      border-radius: 2px;
+      font-size: 10.5px;
       font-weight: 700;
-      margin-top: 4px;
-      letter-spacing: 0.04em;
+      margin-top: 10px;
+      letter-spacing: 0.06em;
     }
 
     /* Issue overview */
@@ -243,25 +299,27 @@
     .sit-tags {
       display: flex;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
       font-size: 12px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .tag-chip {
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--text-2);
-      background: #fff;
+      padding: 5px 12px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      color: var(--ink-2);
+      background: var(--surface);
       font-weight: 600;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.005em;
+      font-size: 11.5px;
     }
 
     .tag-chip.cat {
-      background: #111827;
+      background: var(--ink-1);
       color: #fff;
-      border-color: #111827;
+      border-color: var(--ink-1);
       font-weight: 700;
     }
 
@@ -271,70 +329,72 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--crisis);
       margin-right: 8px;
       vertical-align: middle;
       transform: translateY(-1px);
     }
 
     .tag-chip.timer {
-      background: var(--accent);
+      background: var(--crisis);
       color: #fff;
-      border-color: var(--accent);
+      border-color: var(--crisis);
       font-weight: 700;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+      font-variant-numeric: tabular-nums;
     }
 
     .sit-overview h1 {
-      font-size: 20px;
+      font-size: clamp(20px, 1.5vw + 0.6rem, 26px);
       font-weight: 700;
-      color: var(--text-1);
+      color: var(--ink-1);
       line-height: 1.35;
-      margin-bottom: 14px;
-      letter-spacing: -0.01em;
+      margin-bottom: 22px;
+      letter-spacing: -0.022em;
     }
 
     .key-metrics {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 0;
-      border: 1px dashed var(--border-dash);
-      border-radius: 6px;
-      overflow: hidden;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
     }
 
     .km {
-      padding: 10px 14px;
-      border-right: 1px dashed var(--border-dash);
+      padding: 0 18px;
+      border-right: 1px solid var(--line);
     }
 
-    .km:last-child {
-      border-right: none;
-    }
+    .km:first-child { padding-left: 0; }
+    .km:last-child { border-right: none; padding-right: 0; }
 
     .km .km-label {
-      font-size: 11px;
-      color: var(--text-2);
-      font-weight: 600;
-      margin-bottom: 4px;
-      letter-spacing: 0.02em;
+      font-size: 10.5px;
+      color: var(--ink-3);
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
 
     .km .km-val {
-      font-size: 17px;
+      font-size: 24px;
       font-weight: 800;
-      color: var(--text-1);
+      color: var(--ink-1);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.025em;
+      line-height: 1;
     }
 
     .km .km-hint {
-      font-size: 10px;
-      color: var(--text-3);
-      margin-top: 2px;
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 8px;
+      letter-spacing: -0.005em;
     }
 
     .km .km-hint.up {
-      color: var(--accent);
+      color: var(--crisis);
       font-weight: 600;
     }
 
@@ -370,82 +430,56 @@
       gap: 12px;
     }
 
-    /* ============ Mono scope (hero 제외 전 섹션 흑백톤) ============ */
-    .mono {
-      filter: grayscale(1);
-    }
-
-    .mono a {
-      color: inherit;
-    }
+    /* mono filter no longer used — palette is curated */
+    .mono { filter: none; }
+    .mono a { color: inherit; }
 
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 18px 20px;
+      transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+    .card:hover {
+      border-color: var(--line-strong);
     }
 
     .card .card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      margin-bottom: 8px;
+      font-size: 12px;
+      margin-bottom: 12px;
     }
 
     .card .src-inline {
-      color: var(--text-2);
+      color: var(--ink-3);
       display: flex;
       gap: 6px;
       align-items: center;
       flex-wrap: wrap;
+      font-size: 12px;
     }
 
     .card .src-inline .pub {
-      color: var(--text-1);
+      color: var(--ink-1);
       font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
     .card .src-inline .time {
-      color: var(--text-3);
-    }
-
-    .tier {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      border: 1px solid var(--border);
-      color: var(--text-2);
-      background: #fff;
-    }
-
-    .tier.t1 {
-      background: #111827;
-      color: #fff;
-      border-color: #111827;
-    }
-
-    .tier.t2 {
-      background: #e5e7eb;
-      color: #374151;
-      border-color: #d1d5db;
-    }
-
-    .tier.t3 {
-      background: #fff;
-      color: var(--text-3);
+      color: var(--ink-3);
+      font-variant-numeric: tabular-nums;
     }
 
     .card .title {
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 15.5px;
+      margin-bottom: 10px;
       line-height: 1.4;
-      color: var(--text-1);
+      color: var(--ink-1);
+      letter-spacing: -0.018em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -453,48 +487,50 @@
 
     .card .snip {
       font-size: 13px;
-      color: var(--text-2);
-      line-height: 1.55;
+      color: var(--ink-2);
+      line-height: 1.6;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
     }
 
     .card .card-foot {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      color: var(--text-3);
-      padding-top: 6px;
-      border-top: 1px dashed var(--border-dash);
+      font-size: 11.5px;
+      color: var(--ink-3);
+      padding-top: 12px;
+      border-top: 1px solid var(--line-soft);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.005em;
     }
 
     /* Sentiment chip */
     .chip-sent {
       display: inline-block;
-      padding: 1px 7px;
-      border-radius: 8px;
+      padding: 2px 8px;
+      border-radius: 2px;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     .chip-sent.neg {
-      background: var(--accent-light);
-      color: var(--accent);
+      background: var(--crisis-soft);
+      color: var(--crisis);
     }
 
     .chip-sent.pos {
-      background: var(--pos-light);
+      background: var(--pos-soft);
       color: var(--pos);
     }
 
     .chip-sent.neu {
-      background: #f4f4f5;
-      color: var(--text-2);
+      background: var(--line-soft);
+      color: var(--ink-3);
     }
 
     /* ============ SNS platform summary strip ============ */
@@ -502,63 +538,62 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       background: var(--surface);
-      border: 1px dashed var(--border-dash);
-      border-radius: 8px;
-      padding: 12px 18px;
-      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 16px 22px;
+      margin-bottom: 14px;
     }
 
     .sns-strip .ss {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 0 14px;
-      border-right: 1px dashed var(--border-dash);
+      padding: 0 18px;
+      border-right: 1px solid var(--line);
     }
 
-    .sns-strip .ss:last-child {
-      border-right: none;
-    }
-
-    .sns-strip .ss:first-child {
-      padding-left: 0;
-    }
+    .sns-strip .ss:last-child { border-right: none; }
+    .sns-strip .ss:first-child { padding-left: 0; }
 
     .sns-strip .ss-label {
       font-size: 11px;
-      color: var(--text-2);
-      font-weight: 600;
+      color: var(--ink-3);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .sns-strip .ss-val {
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 800;
-      color: var(--text-1);
+      color: var(--ink-1);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.025em;
     }
 
     .sns-strip .ss-val.accent {
-      color: var(--accent);
+      color: var(--crisis);
     }
 
     .sns-strip .ss-hint {
-      font-size: 10px;
-      color: var(--text-3);
-      margin-left: 4px;
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-left: 6px;
+      font-variant-numeric: tabular-nums;
     }
 
     /* ============ Spread (확산) ============ */
     .spread-grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
       gap: 14px;
     }
 
     .spread-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 24px 26px;
       display: flex;
       flex-direction: column;
     }
@@ -567,21 +602,22 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
     }
 
     .spread-title {
       font-size: 13px;
       font-weight: 700;
-      color: var(--text-1);
+      color: var(--ink-1);
+      letter-spacing: -0.005em;
     }
 
     .spread-legend {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       font-size: 11px;
-      color: var(--text-2);
+      color: var(--ink-3);
     }
 
     .lg-dot {
@@ -589,24 +625,19 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      margin-right: 4px;
+      margin-right: 6px;
       vertical-align: middle;
     }
 
-    .lg-dot.avg {
-      background: #6b7280;
-    }
-
-    .lg-dot.cur {
-      background: #3b82f6;
-    }
+    .lg-dot.avg { background: var(--ink-4); }
+    .lg-dot.cur { background: var(--crisis); }
 
     .bar-chart {
       display: flex;
       justify-content: space-around;
       align-items: flex-end;
       flex: 1;
-      min-height: 180px;
+      min-height: 200px;
       padding: 0 4px;
     }
 
@@ -614,84 +645,70 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       height: 100%;
     }
 
     .bars {
       display: flex;
       align-items: flex-end;
-      gap: 4px;
+      gap: 5px;
       height: 100%;
     }
 
     .bar {
-      width: 18px;
-      border-radius: 3px 3px 0 0;
+      width: 22px;
+      border-radius: 1px 1px 0 0;
     }
 
-    .bar.avg {
-      background: #6b7280;
-    }
-
-    .bar.cur {
-      background: #3b82f6;
-    }
+    .bar.avg { background: var(--line-strong); }
+    .bar.cur { background: var(--crisis); }
 
     .bar-label {
       font-size: 11px;
-      color: var(--text-2);
-      font-weight: 500;
+      color: var(--ink-2);
+      font-weight: 600;
+      letter-spacing: -0.005em;
     }
 
-    .line-chart {
-      width: 100%;
-    }
-
-    .line-svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+    .line-chart { width: 100%; }
+    .line-svg { width: 100%; height: auto; display: block; }
 
     /* ============ Past similar issue card ============ */
     .past-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 22px 24px;
     }
 
     .past-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-      border-bottom: 1px dashed var(--border-dash);
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--line);
     }
 
     .past-card h3 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--text-1);
+      color: var(--ink-1);
       line-height: 1.35;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      letter-spacing: -0.018em;
     }
 
     .sim-pie {
       flex-shrink: 0;
       position: relative;
-      width: 72px;
-      height: 72px;
+      width: 76px;
+      height: 76px;
     }
 
-    .sim-pie svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+    .sim-pie svg { display: block; width: 100%; height: 100%; }
 
     .sim-pie .sim-txt {
       position: absolute;
@@ -704,111 +721,122 @@
     }
 
     .sim-pie .sim-txt span {
-      font-size: 11px;
-      color: var(--text-3);
-      letter-spacing: 0.02em;
+      font-size: 9.5px;
+      color: var(--ink-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
     .sim-pie .sim-txt b {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 800;
-      color: var(--text-1);
+      color: var(--ink-1);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.025em;
     }
 
     .past-sub {
-      font-size: 12px;
-      color: var(--text-3);
-      margin-top: 2px;
+      font-size: 11.5px;
+      color: var(--ink-3);
+      margin-top: 4px;
+      letter-spacing: -0.005em;
     }
 
     .past-articles {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .past-art {
       display: grid;
       grid-template-columns: auto 1fr auto;
-      gap: 8px;
+      gap: 12px;
       align-items: baseline;
       font-size: 13px;
       line-height: 1.4;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line-soft);
     }
+    .past-art:last-child { border-bottom: none; padding-bottom: 0; }
 
     .past-art .pa-src {
       display: flex;
       align-items: center;
       gap: 5px;
-      color: var(--text-2);
-      min-width: 88px;
+      color: var(--ink-3);
+      min-width: 92px;
     }
 
     .past-art .pa-src .pub {
-      color: var(--text-1);
-      font-weight: 600;
+      color: var(--ink-1);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: -0.005em;
     }
 
     .past-art .pa-title {
-      color: var(--text-1);
+      color: var(--ink-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-size: 13px;
     }
 
     .past-art .pa-date {
-      color: var(--text-3);
-      font-size: 10px;
+      color: var(--ink-4);
+      font-size: 10.5px;
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.005em;
     }
 
-    .past-lesson strong {
-      color: var(--text-1);
-    }
+    .past-lesson strong { color: var(--ink-1); }
 
     /* ============ Keyword pulse ============ */
     .kw-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
     }
 
     .kw-card h3 {
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text-1);
-      margin-bottom: 4px;
+      color: var(--ink-3);
+      margin-bottom: 18px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
     }
 
     .kw-card .sub {
-      font-size: 10px;
-      color: var(--text-3);
+      font-size: 11px;
+      color: var(--ink-3);
       font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     .kw-card .caption {
-      font-size: 10px;
-      color: var(--text-3);
+      font-size: 11px;
+      color: var(--ink-3);
       margin-bottom: 14px;
-    }
-
-    .kw-card {
-      display: flex;
-      flex-direction: column;
     }
 
     .bubble-chart {
       position: relative;
       flex: 1;
       min-height: 400px;
-      border: 1px dashed var(--border-dash);
-      border-radius: 6px;
-      margin-bottom: 10px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line-soft);
+      border-radius: 2px;
+      margin-bottom: 14px;
     }
 
     .bubble {
@@ -822,49 +850,50 @@
       font-weight: 700;
       text-align: center;
       line-height: 1.1;
+      letter-spacing: -0.01em;
     }
 
     .bubble .v {
       font-size: 9px;
-      font-weight: 500;
-      margin-top: 2px;
-      color: var(--text-3);
+      font-weight: 600;
+      margin-top: 3px;
+      opacity: 0.7;
+      letter-spacing: 0;
     }
 
     .b-neg {
-      background: var(--accent-light);
-      color: var(--accent);
-      border: 1px solid var(--accent-border);
+      background: var(--crisis);
+      color: #fff;
+      border: 1px solid var(--crisis);
     }
-
     .b-neu {
-      background: #f4f4f5;
-      color: var(--text-2);
-      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink-2);
+      border: 1px solid var(--line-strong);
     }
-
     .b-pos {
-      background: var(--pos-light);
-      color: var(--pos);
-      border: 1px solid #bbf7d0;
+      background: var(--pos);
+      color: #fff;
+      border: 1px solid var(--pos);
     }
 
     .kw-legend {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
-      color: var(--text-3);
+      font-size: 11px;
+      color: var(--ink-3);
+      font-variant-numeric: tabular-nums;
     }
 
     .kw-legend .ld {
       display: flex;
-      gap: 12px;
+      gap: 16px;
     }
 
     .kw-legend .ld .dot {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
     .kw-legend .ld .circle {
@@ -877,16 +906,18 @@
     /* ============ Snapshot ============ */
     .snap-box {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 22px 24px;
     }
 
     .snap-box h3 {
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text-1);
-      margin-bottom: 12px;
+      color: var(--ink-3);
+      margin-bottom: 18px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       display: flex;
       justify-content: space-between;
       align-items: baseline;
@@ -894,51 +925,59 @@
 
     .snap-box h3 .link {
       font-size: 11px;
-      color: var(--text-2);
-      font-weight: 500;
+      color: var(--ink-2);
+      font-weight: 600;
       text-decoration: none;
-      border-bottom: 1px dashed var(--border-strong);
+      border-bottom: 1px solid var(--line-strong);
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     .snap-box h3 .sub {
-      font-size: 10px;
-      color: var(--text-3);
+      font-size: 11px;
+      color: var(--ink-3);
       font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     .comp-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 0;
+      border-top: 1px solid var(--line-soft);
     }
 
     .comp-mini {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      padding: 16px 14px;
+      border-right: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
       text-align: center;
+      position: relative;
     }
+    .comp-mini:nth-child(4n) { border-right: none; }
+    .comp-mini:nth-last-child(-n+4) { border-bottom: none; }
 
     .comp-mini.alert {
-      background: var(--accent-light);
-      border-color: var(--accent-border);
+      background: var(--crisis-soft);
     }
 
     .comp-mini .cm-name {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--text-1);
-      margin-bottom: 6px;
+      color: var(--ink-1);
+      margin-bottom: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      letter-spacing: -0.005em;
     }
 
     .comp-mini .cm-alert-dot {
       width: 6px;
       height: 6px;
-      background: var(--accent);
+      background: var(--crisis);
       border-radius: 50%;
       display: inline-block;
     }
@@ -946,10 +985,11 @@
     .comp-mini .cm-row {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      font-size: 11px;
-      margin-bottom: 4px;
+      gap: 12px;
+      font-size: 12px;
+      margin-bottom: 5px;
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
     }
 
     .comp-mini .cm-row .pos {
@@ -958,26 +998,27 @@
     }
 
     .comp-mini .cm-row .neg {
-      color: var(--accent);
+      color: var(--crisis);
       font-weight: 700;
     }
 
     .comp-mini .cm-delta {
-      font-size: 9px;
-      color: var(--text-3);
+      font-size: 10px;
+      color: var(--ink-3);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -0.005em;
     }
 
     /* Footer */
     .footer-meta {
-      margin-top: 32px;
-      padding-top: 18px;
-      border-top: 1px dashed var(--border-dash);
-      font-size: 10px;
-      color: var(--text-3);
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--ink-3);
       display: flex;
       justify-content: space-between;
-      letter-spacing: 0.02em;
+      letter-spacing: -0.005em;
     }
   </style>
 </head>
@@ -1001,14 +1042,14 @@
     <div class="situation">
       <div class="sit-gauge">
         <svg viewBox="0 0 220 130">
-          <path d="M 20 110 A 90 90 0 0 1 200 110" stroke="#e4e4e7" stroke-width="16" fill="none"
+          <path d="M 20 110 A 90 90 0 0 1 200 110" stroke="#ebe6db" stroke-width="14" fill="none"
             stroke-linecap="round" />
-          <path d="M 182.8 57.1 A 90 90 0 0 1 200 110" stroke="#dc2626" stroke-width="16" fill="none"
+          <path d="M 182.8 57.1 A 90 90 0 0 1 200 110" stroke="#a8221e" stroke-width="14" fill="none"
             stroke-linecap="round" />
           <g transform="translate(110 110) rotate(55.8)">
-            <line x1="0" y1="0" x2="0" y2="-78" stroke="#18181b" stroke-width="3" stroke-linecap="round" />
-            <circle cx="0" cy="0" r="7" fill="#18181b" />
-            <circle cx="0" cy="0" r="3" fill="#fff" />
+            <line x1="0" y1="0" x2="0" y2="-78" stroke="#1a1814" stroke-width="2.5" stroke-linecap="round" />
+            <circle cx="0" cy="0" r="6" fill="#1a1814" />
+            <circle cx="0" cy="0" r="2.5" fill="#fff" />
           </g>
         </svg>
         <div class="gauge-stages">
@@ -1052,14 +1093,14 @@
     <!-- ========== 2. 이슈 기사 ========== -->
     <div class="section mono">
       <div class="section-head">
-        <h2>Tier 1 메이저 일간지 포함 3개 매체가 부정 톤으로 보도 중 <span class="num crit">3건</span></h2>
+        <h2>주요 일간지 포함 3개 매체가 부정 톤으로 보도 중 <span class="num crit">3건</span></h2>
         <span class="meta">2026.04.28 14:24 첫 탐지</span>
       </div>
 
       <div class="grid cols-3">
         <div class="card">
           <div class="card-top">
-            <div class="src-inline"><span class="tier t1">TIER 1</span><span
+            <div class="src-inline"><span
                 class="pub">조선일보</span><span>·</span><span>박서준</span><span class="time">·3시간 전</span></div>
             <span class="chip-sent neg">부정</span>
           </div>
@@ -1073,7 +1114,7 @@
         </div>
         <div class="card">
           <div class="card-top">
-            <div class="src-inline"><span class="tier t1">TIER 1</span><span
+            <div class="src-inline"><span
                 class="pub">동아일보</span><span>·</span><span>이지영</span><span class="time">·3시간 전</span></div>
             <span class="chip-sent neg">부정</span>
           </div>
@@ -1087,7 +1128,7 @@
         </div>
         <div class="card">
           <div class="card-top">
-            <div class="src-inline"><span class="tier t2">TIER 2</span><span
+            <div class="src-inline"><span
                 class="pub">매일경제</span><span>·</span><span>최민호</span><span class="time">·3시간 전</span></div>
             <span class="chip-sent neg">부정</span>
           </div>
@@ -1118,8 +1159,8 @@
               </div>
               <div class="sim-pie">
                 <svg viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f4f6" stroke-width="4" />
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#dc2626" stroke-width="4"
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f0ece2" stroke-width="4" />
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#a8221e" stroke-width="4"
                     stroke-dasharray="92 100" transform="rotate(-90 18 18)" />
                 </svg>
                 <div class="sim-txt"><span>유사도</span><b>92%</b></div>
@@ -1127,27 +1168,27 @@
             </div>
             <div class="past-articles">
               <div class="past-art">
-                <span class="pa-src"><span class="tier t1">TIER 1</span><span class="pub">조선일보</span></span>
+                <span class="pa-src"><span class="pub">조선일보</span></span>
                 <span class="pa-title">D사 냉동만두서 금속 이물질 검출…식약처 회수 명령</span>
                 <span class="pa-date">2024.06.12</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t1">TIER 1</span><span class="pub">중앙일보</span></span>
+                <span class="pa-src"><span class="pub">중앙일보</span></span>
                 <span class="pa-title">"D사 만두 안 먹어요"…맘카페 중심 불매 움직임 확산</span>
                 <span class="pa-date">2024.06.13</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t2">TIER 2</span><span class="pub">한국경제</span></span>
+                <span class="pa-src"><span class="pub">한국경제</span></span>
                 <span class="pa-title">D사 주가 하루 만에 9% 급락…"신뢰 회복 장기화"</span>
                 <span class="pa-date">2024.06.13</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t2">TIER 2</span><span class="pub">매일경제</span></span>
+                <span class="pa-src"><span class="pub">매일경제</span></span>
                 <span class="pa-title">D사 공식 사과…"외부 기관 재검증 결과 공개하겠다"</span>
                 <span class="pa-date">2024.06.14</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t3">TIER 3</span><span class="pub">식품음료신문</span></span>
+                <span class="pa-src"><span class="pub">식품음료신문</span></span>
                 <span class="pa-title">식품업계 "품질관리 시스템 전면 재점검" 목소리</span>
                 <span class="pa-date">2024.06.18</span>
               </div>
@@ -1162,8 +1203,8 @@
               </div>
               <div class="sim-pie">
                 <svg viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f4f6" stroke-width="4" />
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f59e0b" stroke-width="4"
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f0ece2" stroke-width="4" />
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#8a8378" stroke-width="4"
                     stroke-dasharray="78 100" transform="rotate(-90 18 18)" />
                 </svg>
                 <div class="sim-txt"><span>유사도</span><b>78%</b></div>
@@ -1171,22 +1212,22 @@
             </div>
             <div class="past-articles">
               <div class="past-art">
-                <span class="pa-src"><span class="tier t1">TIER 1</span><span class="pub">동아일보</span></span>
+                <span class="pa-src"><span class="pub">동아일보</span></span>
                 <span class="pa-title">"국내산" 표시 가공식품 실제 원산지 논란 확산</span>
                 <span class="pa-date">2023.11.04</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t2">TIER 2</span><span class="pub">머니투데이</span></span>
+                <span class="pa-src"><span class="pub">머니투데이</span></span>
                 <span class="pa-title">가공식품 "원산지 허위 표시" 제재 건수 3배 증가</span>
                 <span class="pa-date">2023.11.06</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t2">TIER 2</span><span class="pub">아시아경제</span></span>
+                <span class="pa-src"><span class="pub">아시아경제</span></span>
                 <span class="pa-title">업계 자정 선언…"원산지 실측 병기" 자율 협약</span>
                 <span class="pa-date">2023.11.11</span>
               </div>
               <div class="past-art">
-                <span class="pa-src"><span class="tier t3">TIER 3</span><span class="pub">농수축산신문</span></span>
+                <span class="pa-src"><span class="pub">농수축산신문</span></span>
                 <span class="pa-title">소비자 83% "원산지 실측 표시 필요" 응답</span>
                 <span class="pa-date">2023.11.15</span>
               </div>
@@ -1232,9 +1273,9 @@
           </div>
           <div class="kw-legend">
             <div class="ld">
-              <span class="dot"><span class="circle" style="background:#dc2626;"></span>부정</span>
-              <span class="dot"><span class="circle" style="background:#a1a1aa;"></span>중립</span>
-              <span class="dot"><span class="circle" style="background:#16a34a;"></span>긍정</span>
+              <span class="dot"><span class="circle" style="background:#a8221e;"></span>부정</span>
+              <span class="dot"><span class="circle" style="background:#d8d2c2;"></span>중립</span>
+              <span class="dot"><span class="circle" style="background:#2f6b46;"></span>긍정</span>
             </div>
             <div>10 / 42 키워드</div>
           </div>
@@ -1343,35 +1384,35 @@
           <div class="line-chart">
             <svg class="line-svg" viewBox="0 0 780 210" xmlns="http://www.w3.org/2000/svg">
               <!-- gridlines -->
-              <line x1="40" y1="20" x2="760" y2="20" stroke="#f3f4f6" />
-              <line x1="40" y1="60" x2="760" y2="60" stroke="#f3f4f6" />
-              <line x1="40" y1="100" x2="760" y2="100" stroke="#f3f4f6" />
-              <line x1="40" y1="140" x2="760" y2="140" stroke="#f3f4f6" />
-              <line x1="40" y1="180" x2="760" y2="180" stroke="#e5e7eb" />
+              <line x1="40" y1="20" x2="760" y2="20" stroke="#f0ece2" />
+              <line x1="40" y1="60" x2="760" y2="60" stroke="#f0ece2" />
+              <line x1="40" y1="100" x2="760" y2="100" stroke="#f0ece2" />
+              <line x1="40" y1="140" x2="760" y2="140" stroke="#f0ece2" />
+              <line x1="40" y1="180" x2="760" y2="180" stroke="#e8e3d8" />
 
               <!-- Y-axis labels -->
-              <text x="34" y="24" font-size="10" fill="#9ca3af" text-anchor="end">50</text>
-              <text x="34" y="64" font-size="10" fill="#9ca3af" text-anchor="end">40</text>
-              <text x="34" y="104" font-size="10" fill="#9ca3af" text-anchor="end">30</text>
-              <text x="34" y="144" font-size="10" fill="#9ca3af" text-anchor="end">20</text>
-              <text x="34" y="184" font-size="10" fill="#9ca3af" text-anchor="end">10</text>
+              <text x="34" y="24" font-size="10" fill="#8a8378" text-anchor="end">50</text>
+              <text x="34" y="64" font-size="10" fill="#8a8378" text-anchor="end">40</text>
+              <text x="34" y="104" font-size="10" fill="#8a8378" text-anchor="end">30</text>
+              <text x="34" y="144" font-size="10" fill="#8a8378" text-anchor="end">20</text>
+              <text x="34" y="184" font-size="10" fill="#8a8378" text-anchor="end">10</text>
 
               <!-- avg threshold dashed line (value=20 → y=140) -->
-              <line x1="40" y1="140" x2="760" y2="140" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3 4" />
-              <rect x="44" y="132" width="34" height="16" rx="8" fill="#e5e7eb" />
-              <text x="61" y="143" fill="#6b7280" font-size="10" font-weight="500" text-anchor="middle">평균</text>
+              <line x1="40" y1="140" x2="760" y2="140" stroke="#d8d2c2" stroke-width="1" stroke-dasharray="3 4" />
+              <rect x="44" y="132" width="34" height="16" rx="8" fill="#e8e3d8" />
+              <text x="61" y="143" fill="#4f4a42" font-size="10" font-weight="500" text-anchor="middle">평균</text>
 
               <!-- data line (20 days, 11-30) -->
               <polyline
                 points="40,172 78,162 116,156 154,140 192,148 230,162 268,156 306,168 344,154 382,152 420,160 458,154 496,140 534,124 572,120 610,124 648,96 686,80 724,76 760,72"
-                stroke="#3b82f6" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+                stroke="#a8221e" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
 
               <!-- end dot -->
-              <circle cx="760" cy="72" r="5" fill="#3b82f6" />
-              <circle cx="760" cy="72" r="9" fill="#3b82f6" opacity="0.2" />
+              <circle cx="760" cy="72" r="5" fill="#a8221e" />
+              <circle cx="760" cy="72" r="9" fill="#a8221e" opacity="0.2" />
 
               <!-- X-axis labels (every other day) -->
-              <g fill="#9ca3af" font-size="10" text-anchor="middle">
+              <g fill="#8a8378" font-size="10" text-anchor="middle">
                 <text x="40" y="200">11</text>
                 <text x="116" y="200">13</text>
                 <text x="192" y="200">15</text>
